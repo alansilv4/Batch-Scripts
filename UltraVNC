@@ -1,0 +1,63 @@
+:: Coloque aqui a versão do UltraVNC
+:: Altere este valor para realizar a atualização de todas as estações
+set VERSION=UltraVNC_1_3_2
+
+:: Verifica qual a arquitetura do sistema operacional 32bits ou 64bits.
+Setlocal EnableDelayedExpansion
+
+for /f "skip=1" %%p in ('wmic OS get OSArchitecture') do ( 
+  set arquitetura="%%p"
+  goto Teste
+)
+
+:Teste
+IF %arquitetura%=="32" goto 32bits
+IF %arquitetura%=="32-bit" goto 32bits
+IF %arquitetura%=="64" goto 64bits
+IF %arquitetura%=="64-bit" goto 64bits
+
+:32bits
+:: Verifica se o UltraVNC está instalado com a versão informada no script, caso esteja finaliza o script.
+IF EXIST "%ProgramFiles%\uvnc bvba\%VERSION%.txt" goto END
+
+:: Parando o serviço do UltraVNC e removendo a versão existente.
+net stop uvnc_service
+"%programfiles%\uvnc bvba\UltraVNC\unins000.exe" /VERYSILENT /NORESTART
+
+:: Verifica se existe o diretorio do UltraVNC, caso contrario irá criar.
+IF NOT EXIST "%ProgramFiles%\uvnc bvba\UltraVNC\" md "%ProgramFiles%\uvnc bvba\UltraVNC\"
+
+:: Copia o arquivo de configuração para o diretorio criado.
+COPY "\\server\apps_gpo\UltraVNC\x86\ultravnc.ini" "%programfiles%\uvnc bvba\UltraVNC" /Y
+
+:: Executa o instalador do UltraVNC 32bits.
+"\\server\apps_gpo\UltraVNC\x86\UltraVNC_1_3_2_X86_Setup.exe" /verysilent /loadinf="\\server\apps_gpo\UltraVNC\x86\uvncinstall.inf" /log
+
+:: Arquivo de texto para identificar a versão instalada.
+DEL "%ProgramFiles%\uvnc bvba\*.txt" /f /q
+echo pwouet > "%ProgramFiles%\uvnc bvba\%VERSION%.txt"
+
+goto END
+
+:64bits
+:: Verifica se o UltraVNC está instalado com a versão informada no script, caso esteja finaliza o script.
+IF EXIST "%ProgramFiles%\uvnc bvba\%VERSION%.txt" goto END
+
+:: Parando o serviço do UltraVNC e removendo a versão existente.
+net stop uvnc_service
+"%programfiles%\uvnc bvba\UltraVNC\unins000.exe" /VERYSILENT /NORESTART
+
+:: Verifica se existe o diretorio do UltraVNC, caso contrario irá criar.
+IF NOT EXIST "%ProgramFiles%\uvnc bvba\UltraVNC\" md "%ProgramFiles%\uvnc bvba\UltraVNC\"
+
+:: Copia o arquivo de configuração para o diretorio criado.
+COPY "\\server\apps_gpo\UltraVNC\x64\ultravnc.ini" "%ProgramFiles%\uvnc bvba\UltraVNC" /Y	
+
+"\\server\apps_gpo\UltraVNC\x64\UltraVNC_1_3_2_X64_Setup.exe" /verysilent /loadinf="\\server\apps_gpo\UltraVNC\x64\uvncinstall.inf" /log
+
+:: Arquivo de texto para identificar a versão instalada.
+DEL "%ProgramFiles%\uvnc bvba\*.txt" /f /q
+echo pwouet > "%ProgramFiles%\uvnc bvba\%VERSION%.txt"
+
+:END
+exit
