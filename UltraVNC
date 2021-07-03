@@ -1,3 +1,7 @@
+:: Para a execução correta do script, inicialmente será necessário instalar o UltraVNC Server em um host e configurar as senhas de acesso.
+:: Após a configuração, será gerado o arquivo “ultravnc.ini” no diretório “%programfiles%\uvnc bvba\UltraVNC”.
+:: Esse arquivo será utilizado pelo script para aplicar as mesmas configurações nas instalações via script.
+
 :: Coloque aqui a versão do UltraVNC
 :: Altere este valor para realizar a atualização de todas as estações
 set VERSION=UltraVNC_1_3_2
